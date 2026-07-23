@@ -1,0 +1,53 @@
+name: Package Request
+description: Request a new desktop app to be packaged
+title: "package request: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **We only add packages we personally use.** For other tools, we welcome contributions
+        where you package and maintain it yourself.
+
+        See existing packages in `packages/` for examples, and `AGENTS.md` for guidelines.
+        Add yourself to `lib/default.nix` if you're not in nixpkgs maintainers.
+  - type: input
+    id: tool-name
+    attributes:
+      label: Tool name
+      placeholder: e.g., element-desktop
+    validations:
+      required: true
+  - type: input
+    id: tool-url
+    attributes:
+      label: Project URL
+      placeholder: https://example.com
+    validations:
+      required: true
+  - type: dropdown
+    id: contribution
+    attributes:
+      label: Will you package and maintain this?
+      options:
+        - "Yes, I'll submit a PR and maintain it"
+        - "Yes, but I need help with Nix"
+        - "No"
+    validations:
+      required: true
+  - type: textarea
+    id: why-valuable
+    attributes:
+      label: Why is this tool worth packaging?
+      placeholder: |
+        I use this for...
+        It's better than X because...
+    validations:
+      required: true
+  - type: input
+    id: install-method
+    attributes:
+      label: Current installation method
+      placeholder: ".deb / .dmg / Flatpak / ..."
+    validations:
+      required: true

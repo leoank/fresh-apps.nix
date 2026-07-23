@@ -1,0 +1,8 @@
+{
+  "version": "0.0.0",
+  "url": "https://web.whatsapp.com/desktop/mac_native/release/WhatsApp.dmg",
+  "hashes": {
+    "x86_64-darwin": "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+    "aarch64-darwin": "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+  }
+}
