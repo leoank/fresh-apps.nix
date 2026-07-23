@@ -25,17 +25,6 @@ script belongs here.
 - **Nix**: [packages/signal-desktop/package.nix](packages/signal-desktop/package.nix)
 
 </details>
-<details>
-<summary><strong>whatsapp</strong> - WhatsApp Messenger desktop client (macOS native)</summary>
-
-- **Source**: binary
-- **License**: unfree
-- **Homepage**: https://www.whatsapp.com/
-- **Platforms**: aarch64-darwin
-- **Usage**: `nix run github:leoank/fresh-apps.nix#whatsapp -- --help`
-- **Nix**: [packages/whatsapp/package.nix](packages/whatsapp/package.nix)
-
-</details>
 <!-- END GENERATED PACKAGE DOCS -->
 
 ## Status
@@ -43,10 +32,17 @@ script belongs here.
 | Package | x86_64-linux | aarch64-darwin |
 | ---------------- | :----------: | :------------: |
 | `signal-desktop` | yes | yes |
-| `whatsapp` | — | yes |
+| `whatsapp` | — | disabled |
 
 Intel macOS (`x86_64-darwin`) is no longer targeted: nixpkgs-unstable (26.11+)
 has dropped support for that platform.
+
+**WhatsApp is temporarily disabled.** Its upstream Sparkle appcast (the version
+source) currently returns 404 and the dmg endpoint serves unstable content, so
+it cannot be pinned reliably. The package files are preserved in git history —
+restore them with `git checkout <commit> -- packages/whatsapp` (find the commit
+via `git log -- packages/whatsapp`) once a working appcast and a stable dmg URL
+are known.
 
 WhatsApp on Linux is intentionally not packaged. Meta does not ship a Linux
 client; any "WhatsApp for Linux" available elsewhere is a third-party Electron
@@ -85,8 +81,9 @@ reusable `update-flake.yml`) discovers all packages with a `version`
 attribute, fans out one job per package, runs the updater, and opens an
 auto-mergeable PR if anything changed.
 
-- **Signal macOS** — `latest-mac.yml` (electron-updater) → version + per-arch
-  SHA512s, no download needed.
+- **Signal macOS** — `latest-mac.yml` (electron-updater) → version; the
+  universal `.dmg` is downloaded and hashed (its manifest SHA512 describes the
+  pre-notarization file and does not match the stapled dmg that is served).
 - **Signal Linux** — Debian apt `Packages` file → matching `.deb` for the macOS
   version, SHA256 already present. If the Linux build lags the macOS release,
   the updater defers until both match.
@@ -99,9 +96,7 @@ auto-mergeable PR if anything changed.
 ```bash
 nix develop                                       # devshell with nix-update, pyyaml, gh
 python packages/signal-desktop/update.py
-python packages/whatsapp/update.py
 nix build .#signal-desktop                        # on linux or darwin
-nix build .#whatsapp                              # darwin only
 ```
 
 Regenerate the README package section:
