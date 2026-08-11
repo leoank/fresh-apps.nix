@@ -25,19 +25,29 @@ NIX_EXPR = """
 let
   config = builtins.fromJSON (builtins.getEnv "DISCOVERY_CONFIG");
   flake = builtins.getFlake (toString ./.);
-  pkgs = flake.packages.${config.system};
+  # Blueprint filters each system's package set by meta.platforms, so a
+  # darwin-only package (e.g. whatsapp) never appears under x86_64-linux.
+  # Merge every system's set so such packages are still discovered; a package
+  # present on several systems collapses to one entry (same version, since the
+  # version lives in the shared hashes.json). This is pure evaluation, so it
+  # runs on any runner regardless of the packages' target platforms.
+  systems = builtins.attrNames (flake.packages or { });
+  pkgs = builtins.foldl' (acc: sys: acc // (flake.packages.${sys} or { })) { } systems;
   isHidden = pkg: pkg.passthru.hideFromDocs or false;
   updateEvenIfHidden = pkg: pkg.passthru.updateEvenIfHidden or false;
   shouldDiscover = pkg: !(isHidden pkg) || updateEvenIfHidden pkg;
+  versionOf = pkg:
+    let
+      v = builtins.tryEval (
+        if pkg ? version && shouldDiscover pkg then pkg.version else null
+      );
+    in
+    if v.success then v.value else null;
   getVersion = name:
-    if pkgs ? ${name} && pkgs.${name} ? version && shouldDiscover pkgs.${name}
-    then { inherit name; value = pkgs.${name}.version; }
-    else null;
+    if pkgs ? ${name} then { inherit name; value = versionOf pkgs.${name}; } else null;
 in
   if config.filter == null then
-    builtins.mapAttrs (name: pkg:
-      if pkg ? version && shouldDiscover pkg then pkg.version else null
-    ) pkgs
+    builtins.mapAttrs (_name: pkg: versionOf pkg) pkgs
   else
     builtins.listToAttrs
       (builtins.filter (x: x != null) (map getVersion config.filter))

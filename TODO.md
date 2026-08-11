@@ -108,11 +108,13 @@ Pick one of the two paths and apply it.
   this flake don't re-extract `.dmg`s. Without it, every consumer pays
   the full unpack cost. Update `flake.nix → nixConfig.extra-substituters`
   to point at your cache, mirroring llm-agents.nix.
-- [ ] Add a `nix flake check` workflow that runs on PRs — currently the
-  `meta-maintainers` check only runs locally / on `nix flake check`.
-- [ ] Add a per-platform smoke build workflow that actually `nix build`s
-  each package on its target OS on PR. The update workflow trusts the
-  updater; nothing else builds Signal on darwin or WhatsApp anywhere.
+- [x] Add a `nix flake check` workflow that runs on PRs
+  (`.github/workflows/flake-check.yml`, matrix `ubuntu-latest` +
+  `macos-latest`).
+- [x] Add a per-platform smoke build workflow that actually `nix build`s each
+  package on its target OS on PR. Covered by `flake-check.yml`: `nix flake check` builds every buildable derivation for the runner's system, so
+  `ubuntu-latest` builds Signal (Linux) and `macos-latest` builds Signal +
+  WhatsApp (darwin).
 - [ ] Add an `aarch64-linux` build of `signal-desktop`. Signal publishes
   ARM `.deb`s; the apt Packages file at
   `updates.signal.org/desktop/apt/dists/xenial/main/binary-arm64/Packages`
