@@ -25,6 +25,17 @@ script belongs here.
 - **Nix**: [packages/signal-desktop/package.nix](packages/signal-desktop/package.nix)
 
 </details>
+<details>
+<summary><strong>whatsapp</strong> - WhatsApp Messenger desktop client (macOS native)</summary>
+
+- **Source**: binary
+- **License**: unfree
+- **Homepage**: https://www.whatsapp.com/
+- **Platforms**: aarch64-darwin
+- **Usage**: `nix run github:leoank/fresh-apps.nix#whatsapp -- --help`
+- **Nix**: [packages/whatsapp/package.nix](packages/whatsapp/package.nix)
+
+</details>
 <!-- END GENERATED PACKAGE DOCS -->
 
 ## Status
@@ -32,17 +43,10 @@ script belongs here.
 | Package | x86_64-linux | aarch64-darwin |
 | ---------------- | :----------: | :------------: |
 | `signal-desktop` | yes | yes |
-| `whatsapp` | — | disabled |
+| `whatsapp` | — | yes |
 
 Intel macOS (`x86_64-darwin`) is no longer targeted: nixpkgs-unstable (26.11+)
 has dropped support for that platform.
-
-**WhatsApp is temporarily disabled.** Its upstream Sparkle appcast (the version
-source) currently returns 404 and the dmg endpoint serves unstable content, so
-it cannot be pinned reliably. The package files are preserved in git history —
-restore them with `git checkout <commit> -- packages/whatsapp` (find the commit
-via `git log -- packages/whatsapp`) once a working appcast and a stable dmg URL
-are known.
 
 WhatsApp on Linux is intentionally not packaged. Meta does not ship a Linux
 client; any "WhatsApp for Linux" available elsewhere is a third-party Electron
@@ -87,16 +91,19 @@ auto-mergeable PR if anything changed.
 - **Signal Linux** — Debian apt `Packages` file → matching `.deb` for the macOS
   version, SHA256 already present. If the Linux build lags the macOS release,
   the updater defers until both match.
-- **WhatsApp macOS** — Sparkle appcast XML → newest enclosure URL, hashed once
-  via `nix store prefetch-file` and reused for both Intel and Apple Silicon
-  (WhatsApp ships a universal binary).
+- **WhatsApp macOS** — Sparkle appcast at `mac_native/updates/` → newest
+  enclosure's versioned `.zip` URL (the same scheme nixpkgs uses). The pinned
+  `?version=` URL is deterministic; the zip is hashed once and reused for both
+  Intel and Apple Silicon (WhatsApp ships a universal binary).
 
 ## Manual update
 
 ```bash
 nix develop                                       # devshell with nix-update, pyyaml, gh
 python packages/signal-desktop/update.py
+python packages/whatsapp/update.py
 nix build .#signal-desktop                        # on linux or darwin
+nix build .#whatsapp                              # darwin only
 ```
 
 Regenerate the README package section:
@@ -138,7 +145,7 @@ checks/
   meta-maintainers.nix     force-evaluates meta.maintainers for every package
 packages/
   signal-desktop/          .deb (linux) and .dmg (darwin)
-  whatsapp/                .dmg only, universal
+  whatsapp/                .zip only, universal (darwin)
   formatter/               treefmt config (passthru.hideFromDocs)
 scripts/
   updater/                 vendored http / hash / json helpers
