@@ -42,6 +42,7 @@ ignore = [
   "EXE003",
   "EXE005",
   "COM812",
+  "CPY001", # missing-copyright-notice: this project uses no per-file headers
 ]
 
 [tool.ruff.lint.per-file-ignores]
