@@ -24,6 +24,7 @@
   gtk3,
   libdrm,
   libnotify,
+  libpulseaudio,
   libxkbcommon,
   libsecret,
   mesa,
@@ -113,6 +114,7 @@ else
       gtk3
       libdrm
       libnotify
+      libpulseaudio
       libxkbcommon
       libsecret
       mesa
