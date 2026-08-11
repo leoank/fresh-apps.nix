@@ -55,6 +55,23 @@ def load_nix_update_args(name: str) -> list[str]:
     ]
 
 
+# Systems the flake targets, in the order we probe for a package's outputs.
+# Blueprint filters each system's set by meta.platforms, so a darwin-only
+# package resolves only under a darwin system; probing several keeps the
+# version/changelog read working regardless of a package's platforms.
+CANDIDATE_SYSTEMS = ("x86_64-linux", "aarch64-darwin", "aarch64-linux")
+
+
+def resolve_package_attr(name: str) -> str | None:
+    """Return the flake attr path for ``name`` on the first system exposing it."""
+    for system in CANDIDATE_SYSTEMS:
+        attr = f".#packages.{system}.{name}"
+        if nix_eval_raw(f"{attr}.version") is not None:
+            return attr
+    log.warning("::warning::Could not resolve package %s on any system", name)
+    return None
+
+
 def update_package(name: str) -> None:
     """Update a single package using its custom update.py or nix-update."""
     log.info("Updating package %s...", name)
@@ -76,9 +93,9 @@ def update_package(name: str) -> None:
         write_output("updated", "false")
         return
 
-    attr = f".#packages.x86_64-linux.{name}"
-    new_version = nix_eval_raw(f"{attr}.version") or "unknown"
-    changelog = nix_eval_raw(f"{attr}.meta.changelog") or ""
+    attr = resolve_package_attr(name)
+    new_version = (nix_eval_raw(f"{attr}.version") if attr else None) or "unknown"
+    changelog = (nix_eval_raw(f"{attr}.meta.changelog") if attr else None) or ""
     if not changelog:
         log.warning("::warning::Package %s is missing meta.changelog", name)
 

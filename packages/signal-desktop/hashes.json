@@ -1,5 +1,6 @@
 {
   "version": "8.22.0",
+  "linuxUrl": "https://updates.signal.org/desktop/apt/pool/s/signal-desktop/signal-desktop_8.22.0_amd64.deb",
   "hashes": {
     "x86_64-linux": "sha256-HZLgmGqbGJX0Oh4ucm6F9pxifGIeHQkEd7JhtOJu6HA=",
     "aarch64-darwin": "sha256-B9ZuOscJjs0zRFxRTrAdlQCWjKcatYq2UL+jT5czl2U=",

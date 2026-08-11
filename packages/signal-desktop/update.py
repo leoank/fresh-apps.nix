@@ -66,8 +66,13 @@ def parse_packages(text: str) -> list[dict[str, str]]:
     return stanzas
 
 
-def fetch_linux(want_version: str) -> str:
-    """Find the deb for ``want_version`` in the apt Packages file and return its SRI hash."""
+def fetch_linux(want_version: str) -> tuple[str, str]:
+    """Find the deb for ``want_version`` in the apt Packages file.
+
+    Returns ``(sri_hash, url)``. The URL comes from the stanza's authoritative
+    ``Filename`` field rather than a hardcoded pool layout — Signal's pool path
+    is ``pool/s/...`` (not ``pool/main/s/...``) and has drifted before.
+    """
     stanzas = parse_packages(fetch_text(LINUX_PACKAGES))
     matches = [
         s
@@ -80,8 +85,9 @@ def fetch_linux(want_version: str) -> str:
             "Linux build lags the macOS release. Try again later."
         )
         raise RuntimeError(msg)
-    sha256 = matches[0]["SHA256"]
-    return hex_to_sri(sha256)
+    stanza = matches[0]
+    url = f"{BASE}/apt/{stanza['Filename']}"
+    return hex_to_sri(stanza["SHA256"]), url
 
 
 def main() -> None:
@@ -95,10 +101,11 @@ def main() -> None:
         print("Already up to date")
         return
 
-    linux_hash = fetch_linux(version)
+    linux_hash, linux_url = fetch_linux(version)
 
     new = {
         "version": version,
+        "linuxUrl": linux_url,
         "hashes": {
             "x86_64-linux": linux_hash,
             **mac_hashes,

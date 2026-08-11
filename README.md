@@ -123,6 +123,10 @@ Regenerate the README package section:
   package without a maintainer.
 - `.github/workflows/check-readme.yml` — fails any PR whose package metadata
   doesn't match the generated README block.
+- `.github/workflows/flake-check.yml` — runs `nix flake check` on every PR
+  across `ubuntu-latest` and `macos-latest`, so the format check, the
+  `meta-maintainers` eval, and the actual package builds (Signal on Linux,
+  Signal + WhatsApp on darwin) are all exercised before merge.
 
 ## Caveats
 

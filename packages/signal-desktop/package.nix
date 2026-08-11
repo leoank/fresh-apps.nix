@@ -24,6 +24,7 @@
   gtk3,
   libdrm,
   libnotify,
+  libpulseaudio,
   libxkbcommon,
   libsecret,
   mesa,
@@ -86,7 +87,7 @@ else
     inherit version;
 
     src = fetchurl {
-      url = "https://updates.signal.org/desktop/apt/pool/main/s/signal-desktop/signal-desktop_${version}_amd64.deb";
+      url = versionData.linuxUrl;
       hash = hashes.${platform};
     };
 
@@ -113,6 +114,7 @@ else
       gtk3
       libdrm
       libnotify
+      libpulseaudio
       libxkbcommon
       libsecret
       mesa

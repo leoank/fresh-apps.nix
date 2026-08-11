@@ -1,0 +1,26 @@
+name: Flake check
+on:
+  - pull_request
+permissions:
+  contents: read
+jobs:
+  flake-check:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # ubuntu builds the x86_64-linux outputs (format-check,
+          # meta-maintainers, devshell, signal-desktop linux).
+          - runner: ubuntu-latest
+          # macos-latest is Apple Silicon (aarch64-darwin): the only runner
+          # that can build the darwin packages (signal-desktop, whatsapp).
+          - runner: macos-latest
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: cachix/install-nix-action@v31
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+      - name: nix flake check
+        run: nix flake check -L
