@@ -115,6 +115,10 @@ Pick one of the two paths and apply it.
   package on its target OS on PR. Covered by `flake-check.yml`: `nix flake check` builds every buildable derivation for the runner's system, so
   `ubuntu-latest` builds Signal (Linux) and `macos-latest` builds Signal +
   WhatsApp (darwin).
+- [x] Require the flake-check contexts as branch protection on `main` so
+  auto-merge gates on them: `flake-check (ubuntu-latest)` +
+  `flake-check (macos-latest)` required, `strict` off (bot PRs merge
+  independently), `enforce_admins` off (admins can still push directly).
 - [ ] Add an `aarch64-linux` build of `signal-desktop`. Signal publishes
   ARM `.deb`s; the apt Packages file at
   `updates.signal.org/desktop/apt/dists/xenial/main/binary-arm64/Packages`
