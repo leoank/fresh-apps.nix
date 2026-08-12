@@ -11,7 +11,8 @@ jobs:
       group: 'auto-merge:${{ github.head_ref }}'
       cancel-in-progress: true
     steps:
-      - uses: Mic92/auto-merge@main
+      # Pinned to a reviewed commit (supply-chain hygiene); bump deliberately.
+      - uses: Mic92/auto-merge@4ac8209ccc201a1b2d049001cccd77262e689533 # main @ 2026-08-10
         with:
           use-auto-merge: true
           merge-method: merge
