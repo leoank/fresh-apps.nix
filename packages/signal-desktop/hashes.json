@@ -1,9 +1,9 @@
 {
-  "version": "8.24.1",
-  "linuxUrl": "https://updates.signal.org/desktop/apt/pool/s/signal-desktop/signal-desktop_8.24.1_amd64.deb",
+  "version": "8.25.0",
+  "linuxUrl": "https://updates.signal.org/desktop/apt/pool/s/signal-desktop/signal-desktop_8.25.0_amd64.deb",
   "hashes": {
-    "x86_64-linux": "sha256-FkqbhpzFu26iSkUglSiC4SEE25PzZScjoAOCokKSiuY=",
-    "aarch64-darwin": "sha256-XL5YgZ5xhc9mEejja9/x0+4QYYoR5K/jJPL8oRZq3u4=",
-    "x86_64-darwin": "sha256-XL5YgZ5xhc9mEejja9/x0+4QYYoR5K/jJPL8oRZq3u4="
+    "x86_64-linux": "sha256-uwcewkMzBdXtjsZXK3rOsUt1vy3TaysTuVfVZ+P0Ek4=",
+    "aarch64-darwin": "sha256-qn/ap9BybS2reMxeT3sCjo1Ok1QPP2annzW0gm0MTRw=",
+    "x86_64-darwin": "sha256-qn/ap9BybS2reMxeT3sCjo1Ok1QPP2annzW0gm0MTRw="
   }
 }
