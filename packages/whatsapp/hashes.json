@@ -1,8 +1,8 @@
 {
-  "version": "2.26.41.28",
-  "url": "https://web.whatsapp.com/desktop/mac_native/release/?version=2.26.41.28&extension=zip&configuration=Release&branch=master",
+  "version": "2.26.42.19",
+  "url": "https://web.whatsapp.com/desktop/mac_native/release/?version=2.26.42.19&extension=zip&configuration=Release&branch=master",
   "hashes": {
-    "x86_64-darwin": "sha256-JxWtC5x0Qg3jFs0y1mK/4lyrn/gSA40njvhE06HDw1M=",
-    "aarch64-darwin": "sha256-JxWtC5x0Qg3jFs0y1mK/4lyrn/gSA40njvhE06HDw1M="
+    "x86_64-darwin": "sha256-DmKCETIPy0n8Yq/XhwhgPN0vPDTwYu8in37wG6UDWPY=",
+    "aarch64-darwin": "sha256-DmKCETIPy0n8Yq/XhwhgPN0vPDTwYu8in37wG6UDWPY="
   }
 }
