@@ -1,9 +1,12 @@
 name: Update Dependencies
 on:
   schedule:
-    # 06:00 UTC daily — Signal and WhatsApp typically publish during US daytime,
-    # so an early-UTC run usually has the prior day's release ready.
-    - cron: '0 6 * * *'
+    # 01:07 UTC daily, after the US-daytime Signal and WhatsApp releases.
+    # GitHub starts scheduled runs hours late (06:00 ran at 13:00-15:00 in
+    # 2026-10/11), and neusis bumps this input at 03:17 (run ~11:00), so
+    # this must be scheduled well before that for rogue to get the update
+    # the same day. Minute 7: the top of the hour is GitHub's busiest.
+    - cron: '7 1 * * *'
   workflow_dispatch:
     inputs:
       packages:
