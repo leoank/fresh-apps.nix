@@ -1,0 +1,35 @@
+# An update PR whose flake check fails can't auto-merge, so its package
+# silently stops updating. Alert on it: a failed check opens the issue
+# "fresh-apps: <branch> failing" and sends the email; a later green check
+# on that branch closes it. Runs from main with the repo's secrets, and
+# reads only the finished run's metadata, never the PR's code.
+name: Alert on failing update PRs
+on:
+  workflow_run:
+    workflows: [Flake check]
+    types: [completed]
+permissions:
+  contents: read
+  issues: write
+jobs:
+  alert:
+    # Bot branches in this repo only: update/<package>, update-<input>.
+    if: github.event.workflow_run.head_repository.full_name == github.repository && (startsWith(github.event.workflow_run.head_branch, 'update/') || startsWith(github.event.workflow_run.head_branch, 'update-')) && contains(fromJSON('["success","failure"]'), github.event.workflow_run.conclusion)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          POSTMARK_API_KEY: ${{ secrets.POSTMARK_API_KEY }}
+          ALERT_FROM: ghcibot@leoank.me
+          ALERT_TO: leoank98@gmail.com
+          BRANCH: ${{ github.event.workflow_run.head_branch }}
+          CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+          RUN: ${{ github.event.workflow_run.html_url }}
+        run: |
+          state=ok
+          [ "$CONCLUSION" = failure ] && state=failed
+          pr=$(gh pr list --head "$BRANCH" --state all --limit 1 --json url --jq '.[0].url // ""')
+          .github/ci/alert.sh "$state" "fresh-apps: $BRANCH failing" \
+            "Flake check $CONCLUSION on $BRANCH: $RUN${pr:+ (PR $pr)}. Until it passes, the PR can't auto-merge."

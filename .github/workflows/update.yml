@@ -28,3 +28,24 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+  # A failed run opens the issue "fresh-apps: update run failing" and
+  # sends the email once; the next good run closes it.
+  alert:
+    needs: update
+    if: always() && contains(fromJSON('["success","failure"]'), needs.update.result)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v7
+      - env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          POSTMARK_API_KEY: ${{ secrets.POSTMARK_API_KEY }}
+          ALERT_FROM: ghcibot@leoank.me
+          ALERT_TO: leoank98@gmail.com
+          STATE: ${{ needs.update.result == 'failure' && 'failed' || 'ok' }}
+          RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          .github/ci/alert.sh "$STATE" "fresh-apps: update run failing" "Update Dependencies $STATE: $RUN"
