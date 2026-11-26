@@ -82,6 +82,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
       - name: Prepare update branch
+        id: prepare
         # Reuse an existing update/* branch (if any) so manual fixup commits
         # on the open PR are preserved. Rebase onto main and commit on top.
         run: |
@@ -93,7 +94,9 @@ jobs:
           git fetch origin main
           if git fetch origin "$branch"; then
             git checkout -B "$branch" "origin/$branch"
-            if ! git rebase origin/main; then
+            if git rebase origin/main; then
+              echo "rebased=true" >> "$GITHUB_OUTPUT"
+            else
               echo "::warning::Rebase of $branch onto main failed, discarding stale branch"
               git rebase --abort
               git reset --hard origin/main
@@ -101,6 +104,7 @@ jobs:
           else
             git checkout -B "$branch" origin/main
           fi
+          echo "branch=$branch" >> "$GITHUB_OUTPUT"
       - name: Perform update
         id: update
         env:
@@ -124,6 +128,18 @@ jobs:
             "${{ matrix.name }}" \
             "${{ matrix.current_version }}" \
             "${{ steps.update.outputs.new_version }}"
+      - name: Push rebased branch
+        # No new upstream version, but the open PR's branch was rebased onto
+        # main: push it so the PR's CI reruns against current main (e.g. a
+        # formatter or CI fix that landed after the PR was opened).
+        if: steps.update.outputs.updated != 'true' && steps.prepare.outputs.rebased == 'true'
+        env:
+          BRANCH: ${{ steps.prepare.outputs.branch }}
+        run: |
+          old=$(git rev-parse "origin/$BRANCH")
+          if [[ "$(git rev-parse HEAD)" != "$old" ]]; then
+            git push --force-with-lease="refs/heads/$BRANCH:$old" origin "HEAD:refs/heads/$BRANCH"
+          fi
   update-readme:
     needs: [discover, update]
     runs-on: ubuntu-latest
